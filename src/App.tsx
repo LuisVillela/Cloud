@@ -10,7 +10,7 @@ const LESSON = {
   id: "leccion-1",
   title: "La Peste Negra (siglo XIV)",
   // Video: https://www.youtube.com/watch?v=uZKUthKdKKY
-  // Fragmento: 3:14 (194s) → 4:26 (266s aprox)
+  // Fragmento: 3:14 (194s) → 4:27 (~267s)
   videoId: "uZKUthKdKKY",
   start: 194,
   end: 267,
@@ -262,22 +262,20 @@ function VideoScreen({
     return `https://www.youtube-nocookie.com/embed/${lesson.videoId}?${params.toString()}`;
   }, [lesson.videoId, lesson.start, lesson.end, soundOn]);
 
+  // Handshake + suscripción a onStateChange (ended=0)
   useEffect(() => {
-  const w = iframeRef.current?.contentWindow;
-  if (!w) return;
-
-  // habilita canal de eventos
-  w.postMessage(JSON.stringify({ event: "listening", id: 1 }), "*");
-  // suscríbete a cambios de estado (ended = 0)
-  w.postMessage(
-    JSON.stringify({
-      event: "command",
-      func: "addEventListener",
-      args: ["onStateChange"],
-    }),
-    "*"
-  );
-}, [embedUrl]);
+    const w = iframeRef.current?.contentWindow;
+    if (!w) return;
+    w.postMessage(JSON.stringify({ event: "listening", id: 1 }), "*");
+    w.postMessage(
+      JSON.stringify({
+        event: "command",
+        func: "addEventListener",
+        args: ["onStateChange"],
+      }),
+      "*"
+    );
+  }, [embedUrl]);
 
   // Escucha eventos del IFrame API para detectar final inmediatamente
   useEffect(() => {
@@ -300,7 +298,6 @@ function VideoScreen({
     return () => window.removeEventListener("message", onMsg);
   }, [onFinish]);
 
-
   // Fallback timer con pequeño margen negativo para evitar “espera”
   useEffect(() => {
     const t = window.setTimeout(onFinish, Math.max(500, (duration - 0.5) * 1000));
@@ -310,7 +307,6 @@ function VideoScreen({
   // Activar sonido por gesto del usuario (recomendado en iOS)
   const enableSound = () => {
     setSoundOn(true);
-    // También intenta desmutear vía API
     try {
       iframeRef.current?.contentWindow?.postMessage(
         JSON.stringify({ event: "command", func: "unMute", args: [] }),
@@ -364,7 +360,7 @@ function VideoScreen({
   );
 }
 
-// =============== QUIZ (aprovecha el ancho, personajes más grandes) ===============
+// =============== QUIZ (seleccionar → Probar → feedback → Siguiente/Retry) ===============
 function QuizScreen({
   lesson,
   onComplete,
@@ -381,9 +377,12 @@ function QuizScreen({
   setCorrectCount: (n: number) => void;
 }) {
   const q = lesson.questions[quizIndex];
+
+  // Estados
   const [selected, setSelected] = useState<number | null>(null);
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
 
+  // Personajes
   const hero = lesson.heroUrl ? (
     <img src={lesson.heroUrl} alt="hero" className="h-32 object-contain" />
   ) : (
@@ -395,14 +394,21 @@ function QuizScreen({
     <div className="h-32 w-32 grid place-items-center text-5xl">👹</div>
   );
 
+  // Lógica: seleccionar no califica
   const onChoose = (idx: number) => {
     if (status !== "idle") return;
     setSelected(idx);
-    const isCorrect = idx === q.answerIndex;
+  };
+
+  // Calificar con CTA
+  const checkAnswer = () => {
+    if (selected === null) return;
+    const isCorrect = selected === q.answerIndex;
     setStatus(isCorrect ? "correct" : "wrong");
     if (isCorrect) setCorrectCount(correctCount + 1);
   };
 
+  // Siguiente o reintentar
   const next = () => {
     if (quizIndex < lesson.questions.length - 1) {
       setQuizIndex(quizIndex + 1);
@@ -413,10 +419,15 @@ function QuizScreen({
     }
   };
 
+  const retry = () => {
+    setStatus("idle");
+    setSelected(null);
+  };
+
   const progressPct = Math.round(((quizIndex + 1) / lesson.questions.length) * 100);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 pb-24">
       {/* Progreso */}
       <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden shadow-sm">
         <div className="h-full bg-sky-500" style={{ width: `${progressPct}%` }} />
@@ -437,21 +448,29 @@ function QuizScreen({
       <div className="grid grid-cols-1 gap-3">
         {q.options.map((opt, idx) => {
           const isSelected = selected === idx;
-          const isCorrect = idx === q.answerIndex;
-          const color =
-            status === "idle"
-              ? "bg-white hover:bg-gray-50"
-              : isSelected && isCorrect
-              ? "bg-green-100 border-green-400"
-              : isSelected && !isCorrect
-              ? "bg-red-100 border-red-400"
-              : "bg-white";
+          const isAnswer = idx === q.answerIndex;
 
-        return (
+          let cls = "bg-white";
+          if (status === "idle") {
+            cls = isSelected
+              ? "bg-sky-50 border-sky-400 ring-2 ring-sky-200"
+              : "bg-white hover:bg-gray-50";
+          } else if (status === "correct") {
+            cls = isAnswer ? "bg-green-100 border-green-500" : "bg-white";
+          } else if (status === "wrong") {
+            cls = isAnswer
+              ? "bg-green-100 border-green-500"
+              : isSelected
+              ? "bg-red-100 border-red-500"
+              : "bg-white";
+          }
+
+          return (
             <button
               key={idx}
               onClick={() => onChoose(idx)}
-              className={`text-left border rounded-xl px-4 py-3 transition ${color}`}
+              disabled={status !== "idle"}
+              className={`text-left border rounded-xl px-4 py-3 transition ${cls}`}
             >
               {opt}
             </button>
@@ -459,24 +478,54 @@ function QuizScreen({
         })}
       </div>
 
-      {/* Feedback + siguiente */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm">
-          {status === "correct" && <span className="text-green-700">✅ ¡Correcto!</span>}
+      {/* Feedback tipo Duolingo */}
+      {status !== "idle" && (
+        <div
+          className={`mt-3 rounded-xl border px-4 py-3 text-sm ${
+            status === "correct"
+              ? "bg-green-50 border-green-500 text-green-800"
+              : "bg-red-50 border-red-500 text-red-800"
+          }`}
+        >
+          {status === "correct"
+            ? "Correcto"
+            : `Incorrecto. La respuesta era “${q.options[q.answerIndex]}”.`}
+        </div>
+      )}
+
+      {/* CTA fija inferior */}
+      <div className="fixed bottom-4 left-0 right-0 flex justify-center pointer-events-none">
+        <div className="pointer-events-auto w-full max-w-lg px-6">
+          {status === "idle" && (
+            <button
+              onClick={checkAnswer}
+              disabled={selected === null}
+              className={`w-full px-4 py-3 rounded-xl font-semibold text-white transition ${
+                selected === null ? "bg-gray-300" : "bg-sky-600 active:scale-[.99]"
+              }`}
+            >
+              Probar respuesta
+            </button>
+          )}
+
+          {status === "correct" && (
+            <button
+              onClick={next}
+              className="w-full px-4 py-3 rounded-xl font-semibold text-white bg-sky-600 active:scale-[.99]"
+            >
+              Siguiente
+            </button>
+          )}
+
           {status === "wrong" && (
-            <span className="text-red-700">
-              ❌ Intenta de nuevo. (La respuesta correcta estaba disponible)
-            </span>
+            <button
+              onClick={retry}
+              className="w-full px-4 py-3 rounded-xl font-semibold text-white bg-gray-800 active:scale-[.99]"
+            >
+              Intentar de nuevo
+            </button>
           )}
         </div>
-        {status !== "idle" && (
-          <button
-            onClick={next}
-            className="px-4 py-2 rounded-xl bg-sky-600 text-white font-semibold active:scale-[.99] transition"
-          >
-            Siguiente
-          </button>
-        )}
       </div>
     </div>
   );

@@ -166,7 +166,7 @@ export default function App() {
             <VictoryScreen lesson={LESSON} onContinue={backToMap} />
           )}
 
-          {screen === "end" && <EndOfDemoScreen />}
+          {screen === "end" && <EndOfDemoScreen onBack={() => setScreen("map")} />}
         </main>
       )}
     </div>
@@ -620,15 +620,26 @@ function VictoryScreen({
   );
 }
 
-
 // =============== FIN DE DEMO ===============
-function EndOfDemoScreen() {
+function EndOfDemoScreen({ onBack }: { onBack: () => void }) {
   return (
-    <div className="space-y-5">
-      <p className="text-sm">
-        Gracias por jugar. Esta es una demo temprana de <strong>Cloud</strong>, una experiencia de Historia con lecciones cortas y desafíos.
-        Si te gustó, pronto liberaremos más niveles. ¡Mantente atento!
-      </p>
+    <div className="pb-24">
+      <div className="max-w-lg mx-auto space-y-3 text-center px-6">
+        <p className="text-sm">
+          Gracias por jugar. Esta es una demo temprana de <strong>Cloud</strong>, una experiencia de Historia con lecciones cortas y desafíos.
+          Si te gustó, pronto liberaremos más niveles. ¡Mantente atento!
+        </p>
+      </div>
+
+      {/* CTA fija inferior */}
+      <div className="fixed bottom-4 left-0 right-0 flex justify-center px-6">
+        <button
+          onClick={onBack}
+          className="w-full max-w-lg px-4 py-3 rounded-xl bg-sky-600 text-white font-semibold active:scale-[.99] transition"
+        >
+          Volver a lecciones
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import CoverScreen from "./CoverScreen";
+
 
 /**
  * Cloud – Demo React SPA (mobile-first)
@@ -107,6 +109,7 @@ export default function App() {
   const [quizIndex, setQuizIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [showFinDemo] = useState(false);
+  const [started, setStarted] = useState(false);
 
   const headerTitle: Record<Exclude<Screen, "video">, string> = {
     map: "Lecciones",
@@ -122,11 +125,13 @@ export default function App() {
   const backToMap = () => setScreen("map");
   const tryNextLevel = () => setScreen("end");
 
-  return (
+  
+
+return started ? (
     <div className="min-h-screen w-full bg-W text-gray-800">
       {showHeader && (
         <header className="sticky top-0 z-10 bg-white/75 border-b border-gray-200 mb-4">
-          <div className="max-w-lg mx-auto px-4 py-8">
+          <div className="max-w-lg mx-auto px-4 py-6">
             <h1 className="text-center text-base font-semibold">
               {screen === "map"
                 ? headerTitle.map
@@ -145,10 +150,7 @@ export default function App() {
       ) : (
         <main className="max-w-lg mx-auto px-8 py-6 space-y-5">
           {screen === "map" && (
-            <MapScreen
-              onStartLesson={startLesson}
-              onTryNextLevel={tryNextLevel}
-            />
+            <MapScreen onStartLesson={startLesson} onTryNextLevel={tryNextLevel} />
           )}
 
           {screen === "quiz" && (
@@ -162,16 +164,17 @@ export default function App() {
             />
           )}
 
-          {screen === "victory" && (
-            <VictoryScreen lesson={LESSON} onContinue={backToMap} />
-          )}
+          {screen === "victory" && <VictoryScreen lesson={LESSON} onContinue={backToMap} />}
 
           {screen === "end" && <EndOfDemoScreen onBack={() => setScreen("map")} />}
         </main>
       )}
     </div>
+  ) : (
+    <CoverScreen onStart={() => setStarted(true)} />
   );
 }
+
 
 // =============== MAPA ===============
 function MapScreen({

@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // =============== CONFIG ===============
 const LESSON = {
   id: "leccion-1",
-  title: "La Peste Negra (siglo XIV)",
+  title: "La Peste Negra",
   // Video: https://www.youtube.com/watch?v=uZKUthKdKKY
   // Fragmento: 3:14 (194s) → 4:27 (~267s)
   videoId: "uZKUthKdKKY",
@@ -19,9 +19,12 @@ const LESSON = {
   heroUrl: "/assets/cloud-hero.png",
   enemyUrl: "/assets/enemy-boss.png",
   artifact: {
-    name: "Máscara de Doctor de la Peste",
-    imageUrl: "/assets/plague-mask.png",
+    name: "Espada de Madera",
+    imageUrl: "/assets/sword.png", // cámbialo cuando tengas tu PNG real
+    description:
+      "Descripción: de las primeras fabricadas, antes de la edad de bronce.",
   },
+
 
   // Preguntas (luego las ajustamos al fragmento exacto)
   questions: [
@@ -108,8 +111,8 @@ export default function App() {
   const headerTitle: Record<Exclude<Screen, "video">, string> = {
     map: "Lecciones",
     quiz: "Desafío",
-    victory: "¡Lo lograste!",
-    end: "Fin de la demo",
+    victory: "Resultados",
+    end: "Final",
   };
 
   const showHeader = screen !== "video";
@@ -469,13 +472,11 @@ function QuizScreen({
       <div className="text-base font-semibold">{q.prompt}</div>
       {q.hint && <div className="text-xs text-gray-500 -mt-2">Pista: {q.hint}</div>}
 
-      {/* Opciones */}
+     {/* Opciones */}
 <div className="grid grid-cols-1 gap-3">
   {q.options.map((opt, idx) => {
     const isSelected = selected === idx;
-    const isAnswer   = idx === q.answerIndex;
 
-    // estilos base + color de texto según estado
     let cls = "bg-white";
     let textCls = "text-gray-900";
 
@@ -487,15 +488,14 @@ function QuizScreen({
         cls = "bg-white hover:bg-gray-50";
       }
     } else if (status === "correct") {
-      if (isAnswer) {
+      // Cuando acierta: resalta la elegida en verde
+      if (isSelected) {
         cls = "bg-green-100 border-green-500";
         textCls = "text-green-800";
       }
     } else if (status === "wrong") {
-      if (isAnswer) {
-        cls = "bg-green-100 border-green-500";
-        textCls = "text-green-800";
-      } else if (isSelected) {
+      // Cuando falla: SOLO resalta la elegida en rojo (no mostramos la correcta)
+      if (isSelected) {
         cls = "bg-red-100 border-red-500";
         textCls = "text-red-800";
       }
@@ -514,21 +514,26 @@ function QuizScreen({
   })}
 </div>
 
+{/* Feedback tipo Duolingo */}
+{status !== "idle" && (
+  <div
+    className={`mt-3 rounded-xl border px-4 py-3 text-sm ${
+      status === "correct"
+        ? "bg-green-50 border-green-500 text-green-800"
+        : "bg-red-50 border-red-500 text-red-800"
+    }`}
+  >
+    {status === "correct" ? (
+      "Correcto"
+    ) : (
+      <div>
+        <div>Incorrecto</div>
+        {q.hint && <div className="text-xs mt-1 opacity-90">Pista: {q.hint}</div>}
+      </div>
+    )}
+  </div>
+)}
 
-      {/* Feedback tipo Duolingo */}
-      {status !== "idle" && (
-        <div
-          className={`mt-3 rounded-xl border px-4 py-3 text-sm ${
-            status === "correct"
-              ? "bg-green-50 border-green-500 text-green-800"
-              : "bg-red-50 border-red-500 text-red-800"
-          }`}
-        >
-          {status === "correct"
-            ? "Correcto"
-            : `Incorrecto`}
-        </div>
-      )}
 
       {/* CTA fija inferior */}
       <div className="fixed bottom-4 left-0 right-0 flex justify-center pointer-events-none">
@@ -567,7 +572,6 @@ function QuizScreen({
     </div>
   );
 }
-
 // =============== VICTORIA ===============
 function VictoryScreen({
   lesson,
@@ -577,41 +581,45 @@ function VictoryScreen({
   onContinue: () => void;
 }) {
   return (
-    <div className="space-y-5">
-      <Card>
-        <div className="text-lg font-semibold">Has ganado un artefacto histórico</div>
-        <div className="text-xs text-gray-600">Tema: “{lesson.title}”</div>
+    <div className="pb-24">
+      {/* Contenido centrado en la pantalla */}
+      <div className="min-h-[calc(100dvh-11rem)] flex flex-col items-center justify-center text-center px-6">
+        <div className="text-sm text-gray-600">Has ganado un artefacto histórico</div>
+        <div className="text-xs text-gray-500">Lección: {lesson.title}</div>
 
-        <div className="mt-4 flex items-center gap-4">
-          <div className="w-24 h-24 rounded-xl bg-amber-50 border grid place-items-center overflow-hidden">
-            {lesson.artifact.imageUrl ? (
-              <img
-                src={lesson.artifact.imageUrl}
-                alt="artefacto"
-                className="object-contain w-full h-full"
-              />
-            ) : (
-              <span className="text-4xl">🏺</span>
-            )}
-          </div>
-          <div>
-            <div className="text-base font-semibold">{lesson.artifact.name}</div>
-            <div className="text-xs text-gray-500">¡Se añadió a tu colección!</div>
-          </div>
+        {/* Artefacto sin borde ni fondo, solo sombra */}
+        <div className="mt-4">
+          {lesson.artifact.imageUrl ? (
+            <img
+              src={lesson.artifact.imageUrl}
+              alt="Artefacto histórico"
+              className="w-32 h-32 md:w-36 md:h-36 object-contain mb-2 mt-2"
+            />
+          ) : (
+            <span className="text-5xl">🏺</span>
+          )}
         </div>
 
-        <div className="mt-5 grid">
-          <button
-            onClick={onContinue}
-            className="w-full px-4 py-3 rounded-xl bg-sky-600 text-white font-semibold active:scale-[.99] transition"
-          >
-            Volver a lecciones
-          </button>
+        <div className="text-base font-semibold mt-3">{lesson.artifact.name}</div>
+        <div className="text-xs text-gray-500 mt-1">
+          {("description" in lesson.artifact && (lesson.artifact as any).description) ||
+            "Se añadió a tu colección."}
         </div>
-      </Card>
+      </div>
+
+      {/* CTA fija inferior */}
+      <div className="fixed bottom-4 left-0 right-0 flex justify-center px-6">
+        <button
+          onClick={onContinue}
+          className="w-full max-w-lg px-4 py-3 rounded-xl bg-sky-600 text-white font-semibold active:scale-[.99] transition"
+        >
+          Volver a lecciones
+        </button>
+      </div>
     </div>
   );
 }
+
 
 // =============== FIN DE DEMO ===============
 function EndOfDemoScreen() {

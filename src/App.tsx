@@ -459,38 +459,50 @@ function QuizScreen({
       {q.hint && <div className="text-xs text-gray-500 -mt-2">Pista: {q.hint}</div>}
 
       {/* Opciones */}
-      <div className="grid grid-cols-1 gap-3">
-        {q.options.map((opt, idx) => {
-          const isSelected = selected === idx;
-          const isAnswer = idx === q.answerIndex;
+<div className="grid grid-cols-1 gap-3">
+  {q.options.map((opt, idx) => {
+    const isSelected = selected === idx;
+    const isAnswer   = idx === q.answerIndex;
 
-          let cls = "bg-white";
-          if (status === "idle") {
-            cls = isSelected
-              ? "bg-sky-50 border-sky-400 ring-2 ring-sky-200"
-              : "bg-white hover:bg-gray-50";
-          } else if (status === "correct") {
-            cls = isAnswer ? "bg-green-100 border-green-500" : "bg-white";
-          } else if (status === "wrong") {
-            cls = isAnswer
-              ? "bg-green-100 border-green-500"
-              : isSelected
-              ? "bg-red-100 border-red-500"
-              : "bg-white";
-          }
+    // estilos base + color de texto según estado
+    let cls = "bg-white";
+    let textCls = "text-gray-900";
 
-          return (
-            <button
-              key={idx}
-              onClick={() => onChoose(idx)}
-              disabled={status !== "idle"}
-              className={`text-left border rounded-xl px-4 py-3 transition ${cls}`}
-            >
-              {opt}
-            </button>
-          );
-        })}
-      </div>
+    if (status === "idle") {
+      if (isSelected) {
+        cls = "bg-sky-50 border-sky-400 ring-2 ring-sky-200";
+        textCls = "text-sky-700";
+      } else {
+        cls = "bg-white hover:bg-gray-50";
+      }
+    } else if (status === "correct") {
+      if (isAnswer) {
+        cls = "bg-green-100 border-green-500";
+        textCls = "text-green-800";
+      }
+    } else if (status === "wrong") {
+      if (isAnswer) {
+        cls = "bg-green-100 border-green-500";
+        textCls = "text-green-800";
+      } else if (isSelected) {
+        cls = "bg-red-100 border-red-500";
+        textCls = "text-red-800";
+      }
+    }
+
+    return (
+      <button
+        key={idx}
+        onClick={() => onChoose(idx)}
+        disabled={status !== "idle"}
+        className={`text-left border rounded-xl px-4 py-3 transition ${cls} ${textCls}`}
+      >
+        {opt}
+      </button>
+    );
+  })}
+</div>
+
 
       {/* Feedback tipo Duolingo */}
       {status !== "idle" && (

@@ -26,29 +26,40 @@ const LESSON = {
   // Preguntas (luego las ajustamos al fragmento exacto)
   questions: [
     {
-      prompt:
-        "¿En qué continente comenzó a extenderse rápidamente la Peste Negra en el siglo XIV?",
-      options: ["Europa", "Oceanía", "América", "Antártida"],
-      answerIndex: 0,
-      hint: "Piensa en rutas comerciales medievales.",
-    },
-    {
-      prompt: "¿Cuál fue una consecuencia demográfica clave de la Peste Negra?",
+      prompt: "¿Cuándo surge Jericó, probablemente la primera ciudad de la Tierra?",
       options: [
-        "Aumento masivo de la población",
-        "Disminución significativa de la población",
-        "Estabilización total de la población",
-        "No tuvo impacto demográfico",
+        "Cerca del año 1000 de la era humana",
+        "Cerca del año 4000 de la era humana",
+        "Hace 12 000 años",
+        "Cerca del año 5000 de la era humana"
       ],
-      answerIndex: 1,
+      answerIndex: 0,
+      hint: "El video menciona explícitamente “año 1000 de la era humana”.",
     },
     {
-      prompt:
-        "¿Qué animal suele asociarse a la transmisión de la peste en esa época?",
-      options: ["Gatos", "Ratas y pulgas", "Caballos", "Aves de corral"],
-      answerIndex: 1,
+      prompt: "Durante ese periodo, ¿cuántos humanos había aproximadamente en el mundo?",
+      options: [
+        "Cerca de 5 millones",
+        "50 millones",
+        "500 mil",
+        "500 millones"
+      ],
+      answerIndex: 0,
+      hint: "Menos que la población actual de Londres.",
+    },
+    {
+      prompt: "¿Qué dos logros aparecen cerca del año 5000 de la era humana?",
+      options: [
+        "La primera escritura y la rueda",
+        "La pólvora y la imprenta",
+        "La brújula y el papel",
+        "El hierro y el acero"
+      ],
+      answerIndex: 0,
+      hint: "El video los menciona como hitos casi simultáneos.",
     },
   ],
+
 };
 
 const NEXT_LEVEL = {
@@ -515,7 +526,7 @@ function QuizScreen({
         >
           {status === "correct"
             ? "Correcto"
-            : `Incorrecto. La respuesta era “${q.options[q.answerIndex]}”.`}
+            : `Incorrecto`}
         </div>
       )}
 

@@ -443,14 +443,14 @@ function QuizScreen({
 
   // Personajes
   const hero = lesson.heroUrl ? (
-    <img src={lesson.heroUrl} alt="hero" className="h-32 object-contain" />
+    <img src={lesson.heroUrl} alt="hero" className="h-40 object-contain" />
   ) : (
-    <div className="h-32 w-32 grid place-items-center text-5xl">☁️</div>
+    <div className="h-40 w-40 grid place-items-center text-5xl">☁️</div>
   );
   const enemy = lesson.enemyUrl ? (
-    <img src={lesson.enemyUrl} alt="enemy" className="h-32 object-contain" />
+    <img src={lesson.enemyUrl} alt="enemy" className="h-40 object-contain" />
   ) : (
-    <div className="h-32 w-32 grid place-items-center text-5xl">👹</div>
+    <div className="h-40 w-40 grid place-items-center text-5xl">👹</div>
   );
 
   // Lógica: seleccionar no califica

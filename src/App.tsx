@@ -16,11 +16,11 @@ const LESSON = {
   end: 267,
 
   // Assets (usar public/assets/*)
-  heroUrl: "/assets/cloud-hero.png",
-  enemyUrl: "/assets/enemy-boss.png",
+  heroUrl: "assets/cloud-hero.png",
+  enemyUrl: "assets/enemy-boss.png",
   artifact: {
     name: "Espada de Madera",
-    imageUrl: "/assets/sword.png", // cámbialo cuando tengas tu PNG real
+    imageUrl: "assets/sword.png", // cámbialo cuando tengas tu PNG real
     description:
       "Descripción: de las primeras fabricadas, antes de la edad de bronce.",
   },

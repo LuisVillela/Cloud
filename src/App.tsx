@@ -333,7 +333,7 @@ function VideoScreen({
   }, [duration, onFinish, embedUrl]);
 
   // Activar sonido por gesto del usuario (recomendado en iOS)
-  const enableSound = () => {
+    const enableSound = () => {
     setSoundOn(true);
     try {
       iframeRef.current?.contentWindow?.postMessage(
@@ -347,6 +347,19 @@ function VideoScreen({
     } catch {
       /* ignore */
     }
+  };
+
+  // NUEVO: omitir video (pausa + finalizar)
+  const skipVideo = () => {
+    try {
+      iframeRef.current?.contentWindow?.postMessage(
+        JSON.stringify({ event: "command", func: "pauseVideo", args: [] }),
+        "*"
+      );
+    } catch {
+      /* ignore */
+    }
+    onFinish();
   };
 
   return (
@@ -373,9 +386,27 @@ function VideoScreen({
         </div>
       )}
 
-      {/* Botón para activar sonido */}
+      {/* NUEVO: Botón Omitir video (arriba-derecha, con safe-area) */}
+      <div
+        className="absolute"
+        style={{
+          top: "max(1rem, env(safe-area-inset-top))",
+          right: "max(1rem, env(safe-area-inset-right))",
+          zIndex: 10,
+        }}
+      >
+        <button
+          onClick={skipVideo}
+          className="px-4 py-2 rounded-xl bg-white/90 text-black font-semibold shadow"
+          aria-label="Omitir video"
+        >
+          Omitir video
+        </button>
+      </div>
+
+      {/* Botón para activar sonido (abajo-derecha) */}
       {!soundOn && (
-        <div className="absolute bottom-4 right-4">
+        <div className="absolute bottom-4 right-4" style={{ right: "max(1rem, env(safe-area-inset-right))", bottom: "max(1rem, env(safe-area-inset-bottom))", zIndex: 10 }}>
           <button
             onClick={enableSound}
             className="px-4 py-2 rounded-xl bg-white/90 text-black font-semibold shadow"
@@ -457,8 +488,8 @@ function QuizScreen({
   return (
     <div className="space-y-5 pb-24">
       {/* Progreso */}
-      <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
-        <div className="h-full bg-sky-500" style={{ width: `${progressPct}%` }} />
+      <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-full bg-sky-500 rounded-full" style={{ width: `${progressPct}%` }} />
       </div>
 
       {/* VS */}
@@ -470,7 +501,6 @@ function QuizScreen({
 
       {/* Pregunta */}
       <div className="text-base font-semibold">{q.prompt}</div>
-      {q.hint && <div className="text-xs text-gray-500 -mt-2">Pista: {q.hint}</div>}
 
      {/* Opciones */}
 <div className="grid grid-cols-1 gap-3">
@@ -478,7 +508,7 @@ function QuizScreen({
     const isSelected = selected === idx;
 
     let cls = "bg-white";
-    let textCls = "text-gray-900";
+    let textCls = "text-gray-500";
 
     if (status === "idle") {
       if (isSelected) {

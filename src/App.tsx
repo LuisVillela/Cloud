@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // =============== CONFIG ===============
 const LESSON = {
   id: "leccion-1",
-  title: "La Peste Negra",
+  title: "Primeras ciudades",
   // Video: https://www.youtube.com/watch?v=uZKUthKdKKY
   // Fragmento: 3:14 (194s) → 4:27 (~267s)
   videoId: "uZKUthKdKKY",
@@ -71,15 +71,15 @@ const NEXT_LEVEL = {
 };
 
 const DUMMY_LOCKED_LESSONS = [
-  { id: "l2",  title: "Renacimiento en Italia",            number: 2 },
-  { id: "l3",  title: "Descubrimiento de América (1492)",  number: 3 },
-  { id: "l4",  title: "Revolución Francesa (1789)",        number: 4 },
-  { id: "l5",  title: "Independencias de América",         number: 5 },
-  { id: "l6",  title: "Revolución Industrial",             number: 6 },
-  { id: "l7",  title: "Primera Guerra Mundial",            number: 7 },
-  { id: "l8",  title: "Segunda Guerra Mundial",            number: 8 },
-  { id: "l9",  title: "Guerra Fría",                       number: 9 },
-  { id: "l10", title: "Caída del Muro de Berlín (1989)",   number: 10 },
+  { id: "l2",  title: "Mesopotamia y Antiguo Egipto",                 number: 2 },
+  { id: "l3",  title: "Valle del Indo y China antigua",               number: 3 },
+  { id: "l4",  title: "Edad de Bronce: metalurgia y comercio",        number: 4 },
+  { id: "l5",  title: "Edad de Hierro y primeros imperios",           number: 5 },
+  { id: "l6",  title: "Grecia clásica",                                number: 6 },
+  { id: "l7",  title: "Roma y el Imperio",                             number: 7 },
+  { id: "l8",  title: "Alta Edad Media (feudalismo)",                  number: 8 },
+  { id: "l9",  title: "Baja Edad Media y la Peste Negra",              number: 9 },
+  { id: "l10", title: "Renacimiento en Italia",                        number: 10 },
 ];
 
 // =============== UI helpers ===============
@@ -625,12 +625,10 @@ function VictoryScreen({
 function EndOfDemoScreen() {
   return (
     <div className="space-y-5">
-      <Card>
-        <p className="text-sm">
-          Gracias por jugar. Esta es una demo temprana de <strong>Cloud</strong> – el Duolingo de
-          Historia. Si quieres ver más niveles, ¡mantente atento al lanzamiento oficial!
-        </p>
-      </Card>
+      <p className="text-sm">
+        Gracias por jugar. Esta es una demo temprana de <strong>Cloud</strong>, una experiencia de Historia con lecciones cortas y desafíos.
+        Si te gustó, pronto liberaremos más niveles. ¡Mantente atento!
+      </p>
     </div>
   );
 }

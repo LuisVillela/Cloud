@@ -56,6 +56,18 @@ const NEXT_LEVEL = {
   title: "Siguiente lección (Bloqueada en demo)",
 };
 
+const DUMMY_LOCKED_LESSONS = [
+  { id: "l2",  title: "Renacimiento en Italia",            number: 2 },
+  { id: "l3",  title: "Descubrimiento de América (1492)",  number: 3 },
+  { id: "l4",  title: "Revolución Francesa (1789)",        number: 4 },
+  { id: "l5",  title: "Independencias de América",         number: 5 },
+  { id: "l6",  title: "Revolución Industrial",             number: 6 },
+  { id: "l7",  title: "Primera Guerra Mundial",            number: 7 },
+  { id: "l8",  title: "Segunda Guerra Mundial",            number: 8 },
+  { id: "l9",  title: "Guerra Fría",                       number: 9 },
+  { id: "l10", title: "Caída del Muro de Berlín (1989)",   number: 10 },
+];
+
 // =============== UI helpers ===============
 function Card({
   children,
@@ -176,23 +188,25 @@ function MapScreen({
           </div>
         </Card>
 
-        {/* Lección 2 (fin de demo) */}
-        <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm text-gray-500">Lección 2</div>
-              <div className="font-semibold">{NEXT_LEVEL.title}</div>
-            </div>
-          </div>
-          <div className="mt-4">
-            <button
-              onClick={onTryNextLevel}
-              className="w-full px-4 py-3 rounded-xl bg-gray-300 text-gray-700 font-semibold active:scale-[.99] transition"
-            >
-              Ver lección
-            </button>
-          </div>
-        </Card>
+{/* Lecciones bloqueadas (solo visuales para demo) */}
+{DUMMY_LOCKED_LESSONS.map((lx) => (
+  <Card key={lx.id}>
+    <div className="flex items-center justify-between">
+      <div>
+        <div className="text-sm text-gray-500">Lección {lx.number}</div>
+        <div className="font-semibold">{lx.title}</div>
+      </div>
+    </div>
+    <div className="mt-4">
+      <button
+        onClick={onTryNextLevel} // → muestra “Fin de la demo”
+        className="w-full px-4 py-3 rounded-xl bg-gray-300 text-gray-700 font-semibold active:scale-[.99] transition"
+      >
+        Ver lección
+      </button>
+    </div>
+  </Card>
+))}
       </div>
     </div>
   );
@@ -429,7 +443,7 @@ function QuizScreen({
   return (
     <div className="space-y-5 pb-24">
       {/* Progreso */}
-      <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden shadow-sm">
+      <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
         <div className="h-full bg-sky-500" style={{ width: `${progressPct}%` }} />
       </div>
 
